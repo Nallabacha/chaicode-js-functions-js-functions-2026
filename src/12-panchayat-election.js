@@ -64,17 +64,95 @@
  *   // => "voted!"
  */
 export function createElection(candidates) {
-  // Your code here
+  let check = {};
+  let voted = {};
+  
+  // dynamic — not hardcoded
+  let votes = {};
+  const candidateMap = {};
+  candidates.forEach(c => {
+    votes[c.id] = 0;
+    candidateMap[c.id] = true;
+  });
+
+  const registerVoter = (voter) => {
+    if (voter == null || typeof voter.id !== "string" || voter.age < 18 || check[voter.id])
+      return false;
+    check[voter.id] = true;
+    return true;
+  };
+
+  const castVote = (voterId, candidateId, onSuccess, onError) => {
+    if (!check[voterId]) return onError("voter not registered");
+    if (!candidateMap[candidateId]) return onError("invalid candidate");
+    if (voted[voterId]) return onError("voter already voted");
+
+    voted[voterId] = true;
+    votes[candidateId] += 1;
+    return onSuccess({ voterId, candidateId });
+  };
+
+  const getResults = (sortFn) => {
+    let retval = candidates.map(c => ({
+      id: c.id,
+      name: c.name,
+      party: c.party,
+      votes: votes[c.id]
+    }));
+
+    if (typeof sortFn === "function") retval.sort(sortFn);
+    else retval.sort((a, b) => b.votes - a.votes);
+
+    return retval;
+  };
+
+  const getWinner = () => {
+    let winner = null;
+    let max = 0; // stays 0, so if no votes cast, winner stays null
+
+    candidates.forEach(c => {
+      if (votes[c.id] > max) {
+        max = votes[c.id];
+        winner = c;
+      }
+    });
+
+    return winner;
+  };
+
+  return { registerVoter, castVote, getResults, getWinner };
 }
 
 export function createVoteValidator(rules) {
-  // Your code here
+  return (voter) => {
+    // check required fields dynamically using rules.requiredFields
+    for (let field of rules.requiredFields) {
+      if (voter[field] == null)
+        return { valid: false, reason: `missing field: ${field}` };
+    }
+    if (voter.age < rules.minAge)
+      return { valid: false, reason: `age below minimum ${rules.minAge}` };
+
+    return { valid: true, reason: "" };
+  };
 }
 
 export function countVotesInRegions(regionTree) {
-  // Your code here
+  if (regionTree == null || typeof regionTree !== "object") return 0;
+
+  let total = regionTree.votes || 0;
+  if (Array.isArray(regionTree.subRegions)) {
+    for (let sub of regionTree.subRegions) {
+      total += countVotesInRegions(sub); // recursion
+    }
+  }
+  return total;
 }
 
 export function tallyPure(currentTally, candidateId) {
-  // Your code here
+  // spread into new object — never mutate original
+  return {
+    ...currentTally,
+    [candidateId]: (currentTally[candidateId] || 0) + 1
+  };
 }

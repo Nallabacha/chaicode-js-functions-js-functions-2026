@@ -54,28 +54,74 @@
  */
 export function pipe(...fns) {
   // Your code here
+  // this it he one 
+
+  const ret1 = (item) => {
+    let acc = {}
+    const finalobj = fns.reduce((acc,fn) => {
+      return fn(acc) // acc = acc + fn(acc), the return object is added into acc
+    }, item);
+    return finalobj
+  }
+
+
+  // const ret2 = (item) => {
+  //   let temp = item
+  //   for(let i = 0;i<fns.length;i++) {
+  //     temp = {...temp,...fns[i](temp)}
+  //   }
+  //   return temp;
+  // } dosent work with numbers since ye object ke liiye hai!!
+  return ret1
 }
 
 export function compose(...fns) {
   // Your code here
+  const ret = (item) => {
+    const finalobj = fns.reduceRight((acc,fn) => {
+      return fn(acc)
+    },item)
+    return finalobj
+  }
+  return ret
 }
 
 export function grind(spice) {
   // Your code here
+  return {...spice,form: "powder"};
 }
 
 export function roast(spice) {
   // Your code here
+  return {...spice,roasted: true,aroma: "strong"};
 }
 
 export function mix(spice) {
   // Your code here
+  return {...spice,mixed: true}
 }
 
 export function pack(spice) {
   // Your code here
+  return { ...spice, packed: true, label: `${spice.name} Masala` }
 }
 
 export function createRecipe(steps) {
-  // Your code here
+  // Your code here 
+  if(steps == null || !Array.isArray(steps)) return (x) => x
+  const ret = (item) => {
+    const mapped = steps.map((x) => {
+      if(x === 'grind') return grind;
+      else if(x === 'roast') return roast
+      else if(x === 'mix') return mix
+      else if(x === 'pack') return pack
+    })
+    const res = mapped.reduce(
+      (acc,fn) => {
+        if(typeof fn === 'function') return fn(acc)
+        return acc
+    },item)
+    return res
+  }
+  return ret
 }

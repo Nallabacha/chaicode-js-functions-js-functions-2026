@@ -46,16 +46,59 @@
  */
 export function createFilter(field, operator, value) {
   // Your code here
+  const filt = (item) => {
+    if(operator === '>=') {
+      if(item[field] >= value) return true
+    }
+    else if(operator === '<=') {
+      if(item[field] <= value) return true
+    }
+    else if(operator === '>') {
+      if(item[field] > value) return true
+    }
+    else if(operator === '<') {
+      if(item[field] < value) return true
+    }
+    else if(operator === '===') {
+      if(item[field] === value) return true
+    }
+    return false;
+  }
+  return filt;
 }
 
 export function createSorter(field, order = "asc") {
   // Your code here
+  const sortfunc = (a,b) => {
+    // here a = items[1] and b = items[0]
+    if(order === "asc") {
+      if(a[field]>b[field]) return 1
+      else if(a[field]<b[field]) return -1
+    }
+    if(order === "desc") {
+      if(a[field]>b[field]) return -1
+      else if(a[field]<b[field]) return 1
+    }
+  }
+  return sortfunc
 }
 
 export function createMapper(fields) {
   // Your code here
+  const maps = (item) => {
+    let tempobj = {};
+    for(let j = 0;j<fields.length;j++) tempobj[fields[j]] = item[fields[j]];
+    return tempobj
+  }
+  return maps
 }
 
 export function applyOperations(data, ...operations) {
   // Your code here
+  if(!Array.isArray(data)) return []
+  let arr = data;
+  for(let j = 0;j<operations.length;j++) {
+    arr = operations[j](arr)
+  }
+  return arr
 }

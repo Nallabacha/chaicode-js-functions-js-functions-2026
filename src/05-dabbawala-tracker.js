@@ -50,4 +50,67 @@
  */
 export function createDabbawala(name, area) {
   // Your code here
+  let idmain = 0;
+  let arr = []
+  let remaining = []
+  let completed = 0
+  function addDelivery(from,to) {
+    if(from == undefined || to == undefined || from == '' || to == '') return -1;
+    idmain++;
+    arr.push({
+      id: idmain,
+      from: from,
+      to: to,
+      status: "pending"
+    });
+    return idmain;
+  }
+  function completeDelivery(id) {
+    if(id>idmain) return false;
+    if (arr[id-1].status === "pending") {
+      arr[id-1].status = "completed";
+      completed++
+      return true;
+    }
+    return false;
+  }
+  function getActiveDeliveries() {
+    
+    let n = arr.length
+    for(let i = 0;i<n;i++) {
+      if(arr[i].status === 'pending') remaining.push({
+          id: arr[i].id,
+          from: arr[i].from,
+          to: arr[i].to,
+          status: arr[i].status
+        });
+    }
+    return remaining;
+  }
+  function getStats() {
+    let retval;
+    if(completed == 0) retval = Number(0.00).toFixed(2);
+    else retval = Number((completed/idmain)*100).toFixed(2)
+    return { 
+        name: name,
+        area: area,
+        total: idmain,
+        completed: completed,
+        pending: idmain-completed,
+        successRate: `${retval}%`
+    }
+  }
+
+  function reset() {
+    arr = []
+    idmain = arr.length
+    return true
+  }
+  return {
+    addDelivery: addDelivery,
+    completeDelivery: completeDelivery,
+    getActiveDeliveries: getActiveDeliveries,
+    getStats: getStats,
+    reset: reset
+  }
 }

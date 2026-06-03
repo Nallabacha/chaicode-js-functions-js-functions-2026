@@ -46,12 +46,42 @@
  */
 export function createDialogueWriter(genre) {
   // Your code here
+  if(genre != 'action' && genre != 'romance' && genre != 'comedy' && genre != 'drama') return null;
+  const retval = (hero,villain) => {
+    if(hero == '' || villain == '' || hero == undefined || villain == undefined) return '...'
+    if(genre == 'action') return `${hero} says: 'Tujhe toh main dekh lunga, ${villain}!'`
+    else if(genre == 'romance') return `${hero} whispers: '${villain}, tum mere liye sab kuch ho'`
+    else if(genre == 'comedy') return `${hero} laughs: '${villain} bhai, kya kar rahe ho yaar!'`
+    else if(genre == 'drama') return `${hero} cries: '${villain}, tune mera sab kuch cheen liya!'`
+  };
+  return retval
 }
 
 export function createTicketPricer(basePrice) {
   // Your code here
+  //if(seatType != 'silver' || seatType != 'gold' || seatType != 'platinum') return null
+  if(basePrice <= 0) return null
+  const pricer = (seatType,isWeekend) => {
+    if(seatType == 'silver') basePrice *= 1;
+    else if(seatType == 'gold') basePrice *= 1.5;
+    else if(seatType == 'platinum') basePrice *= 2.0;
+    else return null
+    if(isWeekend) basePrice = basePrice + 0.3*basePrice
+    return basePrice
+  }
+  return pricer
 }
 
 export function createRatingCalculator(weights) {
   // Your code here
+  let val = 0;
+  if(typeof weights != 'object' || weights == null) return null;
+  const retval = (scores) => {
+    if(scores.story && weights.story) val += scores.story*weights.story
+    if(scores.acting && weights.acting) val += scores.acting*weights.acting
+    if(scores.direction && weights.direction) val += scores.direction*weights.direction
+    if(scores.music && weights.music) val += scores.music*weights.music
+    return val
+  }
+  return retval
 }
